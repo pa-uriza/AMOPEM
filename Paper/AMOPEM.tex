@@ -1,0 +1,543 @@
+\documentclass[3p]{elsarticle}
+
+\usepackage{lineno,hyperref,amsmath,amsfonts,multirow}
+%\usepackage[demo]{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{epstopdf}
+\modulolinenumbers[5]
+
+\journal{Industrial Engineering Department}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Elsevier bibliography styles
+%%%%%%%%%%%%%%%%%%%%%%%
+%% To change the style, put a % in front of the second line of the current style and
+%% remove the % from the second line of the style you would like to use.
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Numbered
+%\bibliographystyle{model1-num-names}
+
+%% Numbered without titles
+%\bibliographystyle{model1a-num-names}
+
+%% Harvard
+%\bibliographystyle{model2-names.bst}\biboptions{authoryear}
+
+%% Vancouver numbered
+%\usepackage{numcompress}\bibliographystyle{model3-num-names}
+
+%% Vancouver name/year
+%\usepackage{numcompress}\bibliographystyle{model4-names}\biboptions{authoryear}
+
+%% APA style
+%\bibliographystyle{model5-names}\biboptions{authoryear}
+
+%% AMA style
+%\usepackage{numcompress}\bibliographystyle{model6-num-names}
+
+%% `Elsevier LaTeX' style
+\bibliographystyle{elsarticle-num}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{A Methodology for Option Pricing in Electricity Markets\\Case study: Colombia}
+%\tnoteref{mytitlenote}}
+%\tnotetext[mytitlenote]{Fully documented templates are available in the elsarticle package on \href{http://www.ctan.org/tex-archive/macros/latex/contrib/elsarticle}{CTAN}.}
+
+%% Group authors per affiliation:
+%\author{Elsevier\fnref{myfootnote}}
+%\address{Radarweg 29, Amsterdam}
+%\fntext[myfootnote]{Since 1880.}
+
+%% or include affiliations in footnotes:
+\author[mainaddress]{Pablo Andr\'es Uriza Antorveza
+\corref{mycorrespondingauthor}}
+\cortext[mycorrespondingauthor]{Corresponding author}
+\ead{pa.uriza274@uniandes.edu.co}
+
+
+\author[mainaddress]{Sergio Cabrales}
+\ead{s-cabral@uniandes.edu.co}
+
+\address[mainaddress]{Universidad de los Andes Carrera 1 Este  No. 19A - Bogot\'a, Colombia}
+
+
+\begin{abstract}
+Electricity is a commodity that behaves unlike others in the way that cannot be stored cheaply, its transport depends on existent electrical networks, and can be generated from different sources. This makes the price of electricity highly volatile. As a risk hedging strategy, different financial instruments have been developed, among them, options with electric energy as underlying. We developed a methodology for option pricing in electricity markets, taking into account multi seasonal behaviour. Future electricity prices estimation is presented for equatorial countries with similar climate conditions like hydro-dependent energy generation and tropical seasons (e.g. dry season, wet season), affected by \emph{El Ni\~no Southern Oscillation}. We made a descriptive analysis of the Colombian electricity market. Using mean reversion and mean-reverting jump diffusion models we made a forecast estimation of intra-day (Hourly) electricity prices based on historical spot data from Colombian electricity market. The models were calibrated and the estimation of derivatives is presented and discussed. We concluded that there is no significant difference between modelling seasonality with dummy variables or with Fourier series and that mean reversion models with jumps perform better at option pricing.
+\end{abstract}
+
+\begin{keyword}
+Reliability charge\sep option pricing\sep electricity price\sep hourly price simulation\sep seasonal effects
+\end{keyword}
+
+\end{frontmatter}
+
+%\linenumbers
+\section{Introduction}\label{ch:Intro}
+It has been around a quarter of century since the development of electricity market began. Different reforms to the electricity markets around the world have been made. The appearance of deregulated markets originating electricity spot prices, as well as the negotiation of futures contracts and other derivatives, among others, promoted the investigation in the field of quantitative finance focused on electricity derivatives. One aspect that arouses interest of academics, is the fact that electricity fails to satisfy the basic hypothesis that sustains modern pricing theory, because it cannot be stored (at least not at a reasonable price) \citep{Aid2015}. Because of this, different strategies to hedge the risk of a power outage have been discussed in the literature. One of the approaches is trying to increase the installed capacity for energy production. There exists various methodologies that have been implemented around the world for peak load and capacity pricing \citep{Harris2015}.
+
+Another approach, is to address risk hedging by the use of electricity derivatives including future contracts, and call options with electricity as underlying, as in \citep{Barroso2006}, which generates expansion signals.
+The study of seasonal and stochastic effects on commodities prices dynamics has shown to be very important;  Articles as \citep{Schwartz1997a},\cite{Borovkova2006} among others, research how to represent and include seasonality in mathematical models. Several papers have made an extensive investigation on electricity behaviour. Some of them have noted that the electricity spot price follows a mean reverting process\citep{Lucia2002a}, whiles other include the possibility of jumps in prices \citep{Cartea}, \citep{Escribano2011}. To deepen the topics covered in this paper, it is suggested to consult \citep{Aid2015} and \citep{Benth2014}.
+
+We present a methodology for option pricing with electric energy as underlying, taking into account multi seasonal behaviour. The main description of this methodology is found in section \ref{ch:PricMet}. Section \ref{ch:DCA} refers to the data used and discusses some relevant aspects of the Colombian electricity price behaviour. Based on this data, section \ref{ch:MEE} exposes some mean reversion and mean-reverting jump diffusion models to simulate intra-day (Hourly) future electricity prices estimation. Sections \ref{ch:MCSim} and \ref{ch:OPPric} explain the procedure of the simulation of different price paths based on the models and the valuation of a portfolio of call options based on a simulation approach, respectively. Finally, section \ref{ch:Conclu} presents the conclusions obtained from this work.
+
+\section{Colombian electricity system description}\label{ch:ElecSys}
+Colombia is an Hispanic country located at the north of south America just above the equator line. As other countries from the same region, Colombia being between the tropics, doesn't have calendar seasons (e.g. summer, winter, etc.) but tropical seasons of wetness and drought. Among countries like Brazil and Venezuela, Colombia has plenty of water sources, which greatly influences the way these nations generate electricity \citep{CREG2006}. Thus, have a hydro-dependant power generation system. The total installed power capacity of Colombia, by the year 2010 was of 15 521.7 MW \cite{UPME2015} from which, according to Figure \ref{fig:PartElec}, approximately 70.35\% corresponds to hydro-powered systems. 
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.3]{Figures/PartElectrica.pdf}
+\caption{Participation in the Colombian electric matrix by technology (Data source: XM \cite{XM}).}
+\label{fig:PartElec}
+\end{figure}
+
+Although generating electricity principally from water is a low operating cost alternative (with exception of the initial investment), the quantity produced is heavily influenced by external shocks as, for example, a climate phenomenon called \emph{El Ni\~no Southern Oscillation} (ENSO). Which corresponds to a variation in central and oriental Pacific's temperature due to changes in atmospheric pressure. An increase in the temperature is related with drought seasons in Latin-American countries (\emph{El Ni\~no}), whilst a decrement in temperature impacts wet seasons (\emph{La Ni\~na}). The availability of electricity affects its price, so in general, drought seasons tend to get the prices higher. This behaviour can be observed in Figure \ref{fig:ENSOPrice} where historic monthly average prices were plotted and a color scale measures an index called \emph{Oceanic Ni\~no Index} (ONI) \citep{InternationalResearchInstituteforClimateandSociety} which indicates whether in a specific month was under \emph{El Ni\~no} (black) or \emph{La Ni\~na} (light grey) and the color intensity represents the magnitude of the phenomenon.%%which indicates whether in a specific month was under \emph{El Ni\~no} (red) or \emph{La Ni\~na} (blue) and the color intensity represents the magnitude of the phenomenon.
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.7]{Figures/RplotENSOBW.pdf}
+\caption{Monthly average price correlation with ENSO (Data source: XM \cite{XM}).}
+\label{fig:ENSOPrice}
+\end{figure}
+
+The higher peaks in the monthly average series, coincide with the two strongest \emph{El Ni\~no} that have occurred in last 20 years. These tough drought seasons, affected heavily energetic production leading to energy rationing measures. For counter the effects of strong climate fluctuations on electricity prices, in 1996 the Colombian government adopted a measure of Capacity Charge. Which remunerated the generators as they increased their installed capacity. Nevertheless, because of the hydro-dependency of the generation system, more installed capacity not necessarily means greater quantity of energy available. After 10 years of the implementation of this measure, a new methodology was proposed by the regulatory commission (CREG) to assure reliability over the energy available. The new scheme wanted to increase the investment on electricity production assets, by the assignation though an auction of firm energy obligation in scarcity condition (OEF). Firm Energy is defined as ``Non-interruptible energy and power guaranteed by the supplier to be available at all times, except for uncontrollable circumstances"\citep{McCracken}. This methodology is known as reliability charge negotiate OEF which is a Call Option with firm energy as underlying. This electricity derivative, is limited to the maximum quantity of energy each generator guaranties to generate (taking into account climate impact in energy production) and must be supported by a generation asset. From now on, scarcity condition is defined when spot price of electricity is greater than the exercise price of the option. The pay-off profile of this kind of call option for one period is showed in Figure \ref{fig:Payoff}. Where the option holder is the government who pays the Reliability Charge (Option premium) to a generator, for the option of buying energy at a Scarcity Price (Exercise Price) when the spot price exceeds it. Since the main objective of this methodology is to assure firm energy, the derivative being negotiated can be expressed as a portfolio of American call options with different maturities.
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.3]{Figures/payoff.pdf}
+\caption{Pay-off profile of a call option with electric energy as underlying for one period. $y$: Reliability Charge/ Option Premium (\$/ENFICC). $K$: Scarcity Price/ Exercise Price (\$/kWh). $S$: Electric Energy Spot Price (\$/kWh). ENFICC stands for Firm Energy Reliability Charge by its acronym in Spanish.
+}
+\label{fig:Payoff}
+\end{figure}
+
+Let's suppose a firm energy obligation with an exercise price $K$ and maturity $T$ is being negotiated. The obligation's price will be given by:
+
+\begin{align}
+\label{eq:optPrice}
+y(t,S(t),K,T)=E\left [ \int_{\tau=t}^{T}\max(0,S(\tau)-K)e^{-r\tau}d\tau \right ]
+\end{align}
+
+Firm energy obligation cost is the same for all generators, independently of the technology each of them uses. While equation \ref{eq:optPrice} represent theoretically the valuation of an option \citep{Luenberger1998}, the methodology of reliability charge, proposes a way to calculate the scarcity price and the option premium to be accorded in an auction \citep{CREG2006}.
+
+\section{Data collection and analysis}\label{ch:DCA}
+Colombian electricity spot prices were obtained from XM's (The electricity market manager) database, which consists of hourly prices for each of the 24 hours of the day, seven days a week in COP (Colombian Pesos) per kWh, available from July 20, 1995 to the day the data was retrieved. Because of the lack of stability in the market in the first years, data corresponding to dates before January 1, 1997 were ignored. The following analysis is carried out using the electricity spot price time series from January 1, 1997 to August 14, 2016. For being capable of comparing the prices between different dates, the value of the money over time was taken into account, using constant prices of August, 2016. The data was sub-setted into a training set consisting of the spot price until December 31, 2014 and a validation set defined from January 1, 2015 to December 31, 2015.
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.7]{Figures/hourlyprices.eps}
+\caption{Hourly electricity prices from Jul 1995 to Aug 2016 (Data source: XM \cite{XM}).}
+\label{fig:hourlyprice}
+\end{figure}
+
+As seen in Figure \ref{fig:hourlyprice}, electricity prices show high volatility, two high peaks are observable corresponding to the strongest \emph{El Ni\~no} climate phenomenon occurrences in recent years. The first corresponds to 1997 and the second to late 2015. The highest price achieved, occurred on October 2015, and reached over 2800 COP per kWh. To observe if there was some kind of trend across the years, the average price per year was calculated. Figure \ref{fig:yearly} shows how electricity prices grow over the year, which means there exists a growing tendency over time. Although this tendency may not be linear or probably due to a structural change occurred around 2010, this was not modelled because there was no historical information that could explain such change in the data in the model. So for simplicity a linear trend was assumed.
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.7]{Figures/PreciosAnio.eps}
+\caption{Yearly average electricity price (Data source: XM \cite{XM}).}
+\label{fig:yearly}
+\end{figure}
+
+Similarly, the average prices for each month of the year was calculated with the purpose of identifying if there is some kind of intra-year cyclicity. This information can be observed in Figure \ref{fig:intraYear} which clearly exposes the main behaviour of Colombia's climate during the year. A wet season, that corresponds to the valley in the Figure, and a dry season in which the price elevates. This occurs due the availability of water resource for generation throughout the year. That behaviour cannot be modelled with a simple harmonic function, like sine or cosine, because these don't capture all the dynamics.
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.7]{Figures/PreciosMes.eps}
+\caption{Intra-year average electricity price (Data source: XM \cite{XM}).}
+\label{fig:intraYear}
+\end{figure}
+
+Willing to understand the intra-day oscillation of the price, average hourly prices were calculated. We wanted to know if there is a difference in the price behaviour between a weekday, a weekend and a holiday, so the data was discriminated that way. Figure \ref{fig:intraDay} resumes this information and lets us identify an intra-day seasonality that possibly corresponds to the electricity demand throughout the day, with a peak at 7:00 pm that coincides with the hour when the electricity demand is higher whereas the deeper valley is around 4:00 am in which the demand is at is lowest. The change in electricity prices, show the correlation between the intra-day price dynamics and the demand. Also, we noted that holidays and weekends didn't differed too much between each other but vary compared to weekdays. This difference between kinds of days can be easily modelled with a dummy variable. 
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.7]{Figures/PreciosHoraV2.eps}
+\caption{Comparison of intra-day average electricity price for weekdays, weekends and holidays (Data source: XM \cite{XM}).}
+\label{fig:intraDay}
+\end{figure}
+
+\section{Model specification and estimation}\label{ch:MEE}
+Following the approach taken in \citep{Lucia2002a}, we described price behaviour in terms of two types of components: One component that accounts for all the predictable dynamics of the time series, involving things such as a deterministic trend, and cyclical components, involving seasonal climate changes and day-hour demand. On the other hand, the second component is purely stochastic and was assumed to follow two particular continuous time diffusion processes. We formulated models for both the prices ($P_t$) and the logarithm of the prices ($\ln P_t$). For simplicity, we assumed constant interest rates.
+
+\subsection{Price Modelling}
+We developed different price models, based on two types of stochastic processes: mean reversion and mean reversion with jumps. These processes are stationary, for which an Augmented Dickey-Fuller Test was run over the data to test the null hypothesis of a unit root is present in the time series. According to the results, the null hypothesis was rejected, which means the data is stationary, therefore these stochastic processes can be used to model the time series of the electricity prices. Below is shown the explanation and construction of the different models used.
+
+\paragraph{Mean Reversion Process}
+We expressed the stochastic process followed by the spot price as the sum of two components: A known, deterministic function $F(t)$ which stands for the totally predictable component, whereas $X_t$ is a stochastic process.
+
+\begin{align}
+\label{eq:sP}
+P_t=F(t)+X_t
+\end{align}
+
+It is assumed that $X_t$ dynamics are given by:
+
+\begin{align}
+\label{eq:sX}
+dX_t=-\kappa X_tdt+\sigma dZ
+\end{align}
+
+Where $\kappa>0$ and $dZ$ stands for an increment to a standard Brownian motion. Hence $X_t$ follows a mean reversion stochastic process, also known as Ornstein-Uhlenbeck \citep{Dixit1994} with zero long run mean and a $\kappa$ speed of adjustment.
+
+In a similar way, we modelled the natural logarithm of the price $\ln P_t$ as:
+
+\begin{align}
+\label{eq:slnP}
+\ln P_t=F(t)+Y_t
+\end{align}
+
+Where $F(t)$ is again a known deterministic function of time. $Y_t$ follows a stochastic process of the form:
+
+\begin{align}
+\label{eq:sY}
+dY_t=-\kappa Y_tdt+\sigma dZ
+\end{align}
+
+In both cases $P_t$ and $\ln P_t$, tend to a mean value $F(t)$ in the long run. The higher the value of $\kappa$ the faster the convergence to the mean.
+
+\paragraph{Deterministic Component}
+It is necessary that $F(t)$ captures the most relevant predictable behaviour of the electricity prices. Given the historical data, the inclusion of a trend and a cyclical feature among others, seems to be a good approximation of the deterministic  component. We proposed two different deterministic functions described in equations \ref{eq:f1} and \ref{eq:f2}. 
+
+\begin{align}
+\label{eq:f1}
+f_1(t)=\beta_0+\beta_T T+\sum_{i=2}^{12}\mu_iM_{it}+\beta_DD_t+\left [ \sum_{n=1}^{7} \gamma_{sn}\sin\left ( \frac{2\pi n}{24}t \right )+\gamma_{cn}\cos\left ( \frac{2\pi n}{24}t \right )\right ]
+\end{align}
+
+\[T:\
+\begin{array}{ll}
+ \textup{Year of the observation belonging to date } t 
+\end{array}\] 
+
+\[M_{it}\left\{
+\begin{array}{ll}
+      1 & \textup{if date } t \textup{ belongs to the } i \textup{th calendar month} \\
+      0 & \textup{otherwise} \\
+\end{array}
+\forall i =2,3,...12
+\right. \]  
+
+\[D_t\left\{
+\begin{array}{ll}
+      1 & \textup{if date } t \textup{ is a holiday or weekend} \\
+      0 & \textup{otherwise} \\
+\end{array} 
+\right. \]
+
+Based on the analysis made in section \ref{ch:DCA}, a trend term $T$ is added to the function to include the price growth over the years (Figure \ref{fig:yearly}). Also, a dummy variable which denotes from which month of the year is the observation is used to model the seasonal climate change over the year (Figure \ref{fig:intraYear}). Knowing there is no apparent difference between holidays and weekend average prices (Figure \ref{fig:intraDay}), a dummy variable $D_t$ models whether an observations corresponds to a holiday/weekend or not. Given that we wanted to be able to represent the hourly price, we needed to model the intra-day behaviour which doesn't have a simple functional form to describe it. Thus, we decided to use a Fourier series representation of order 7 to capture accurately the peak and valley of the intra-day average price.
+
+Alternatively, for the second deterministic function, instead of the month dummy variables, we used a 5 order Fourier series to represent the intra-year cycle as in \citep{Escribano2011}. The other terms of the function remain the same as in equation  \ref{eq:f1}. Because the time series has hourly observations, the terms corresponding to the Fourier series are expressed such that the formulae are consistent. Therefore the frequency term accompanying the sine and cosine for the intra-day component has a 24 representing the hours of the day. Similarly the frequency term accompanying the harmonic functions for the intra-year component has a 8766, because there are 8766 hours in 365.25 days a year (taking into account leap years).
+
+\begin{align}
+\label{eq:f2}
+\begin{split}
+f_2(t)=\beta_0+\beta_T T+\left [ \sum_{m=1}^{5} \psi_{sm}\sin\left ( \frac{2\pi m}{8766}t \right )+\psi_{cm}\cos\left ( \frac{2\pi m}{8766}t \right )\right ]+\\
+\beta_DD_t+\left [ \sum_{n=1}^{7} \gamma_{sn}\sin\left ( \frac{2\pi n}{24}t \right )+\gamma_{cn}\cos\left ( \frac{2\pi n}{24}t \right )\right ]
+\end{split}
+\end{align}
+
+\[T:\
+\begin{array}{ll}
+ \textup{Year of the observation belonging to date } t 
+\end{array}\] 
+
+\[D_t\left\{
+\begin{array}{ll}
+      1 & \textup{if date } t \textup{ is a holiday or weekend} \\
+      0 & \textup{otherwise} \\
+\end{array} 
+\right. \]
+
+\paragraph{Mean Reversion Process with Jumps}
+Ornstein-Uhlenbeck process as other diffusion processes, is characterized for being continuous everywhere. However, some variables present discontinuities in their behaviour. Due to volatility of the electricity price, we proposed models considering discrete jumps. As before, $\ln P_t$ will be written as:
+
+\begin{align}
+\label{eq:slnP2}
+\ln P_t=f(t)+Y_t
+\end{align}
+
+Nonetheless $Y_t$ now follows an Ornstein-Uhlenbeck process with jumps as \cite{Cartea} given by:
+
+\begin{align}
+\label{eq:slnPJ}
+dY_t=(\alpha -\kappa Y_t)dt+\sigma dZ+J(\mu_J,\sigma_J) d\Pi(\lambda)
+\end{align}
+
+Where $\kappa$ is the mean reverting speed, $dZ$ represents an increment to a standard Brownian motion, $\sigma$ is the volatility, $J\sim N(\mu_J,\sigma^2_J)$ and $d\Pi(\lambda)$ is a Poisson distributed random variable with rate $\lambda$.
+
+It is important to remark that ENSO wasn't modelled in the deterministic component, because its occurrence is very variable and should be represented as a separate stochastic process. Given that its presence is not too frequent, we tried to approach this work without including directly an ENSO component.  Anyway, we consider that this is a subject that must be incorporated in future work.
+
+\subsection{Price models and parameter estimation}
+In this subsection, the different models proposed to represent the dynamics of electricity prices are exposed, as well as the methods used for estimating the parameters associated.
+
+\paragraph{Mean reverting models}
+In order to estimate the parameters of the models using the discrete data available, we discretized the continuous-time expression of equation \ref{eq:sX} as follows:
+
+\begin{align}
+\label{eq:disc}
+X_t=(1-\kappa) X_{t-1}+\sigma \xi_t
+\end{align}
+
+Where the innovations $\xi_t\sim N(0,1)$ i.i.d. The same discretization is used for the stochastic process followed by $Y_t$ presented in equation \ref{eq:sY}. By implementing this discretization and the deterministic components exposed before, the models constructed are: 
+
+\textit{\textbf{Model 1.} Price - Mean reversion, months as dummy variables}.
+
+\begin{align}
+\label{eq:m1}
+\begin{split}
+P_t=f_1(t)+X_t\\
+X_t=\phi X_{t-1}+\sigma \xi_t
+\end{split}
+\end{align}
+
+\textit{\textbf{Model 2.} Price - Mean reversion, months as Fourier series}.
+
+\begin{align}
+\label{eq:m2}
+\begin{split}
+P_t=f_2(t)+X_t\\
+X_t=\phi X_{t-1}+\sigma \xi_t
+\end{split}
+\end{align}
+
+\textit{\textbf{Model 3.} Natural logarithm of price - Mean reversion, months as dummy variables}.
+
+\begin{align}
+\label{eq:m3}
+\begin{split}
+\ln P_t=f_1(t)+Y_t\\
+Y_t=\phi Y_{t-1}+\sigma \xi_t
+\end{split}
+\end{align}
+
+\textit{\textbf{Model 4.} Natural logarithm of price - Mean reversion, months as Fourier series}.
+
+\begin{align}
+\label{eq:m4}
+\begin{split}
+\ln P_t=f_2(t)+Y_t\\
+Y_t=\phi Y_{t-1}+\sigma \xi_t
+\end{split}
+\end{align}
+
+With $f_1(t)$ and $f_2(t)$ as described in equations \ref{eq:f1} and \ref{eq:f2}, and $\phi=1-\kappa$. For estimating the parameters, all Models 1 to 4 can be expressed in the general form:
+
+\begin{align}
+\label{eq:gen1}
+\begin{split}
+y_t=f(\Theta,x_t)+\varepsilon_t\\
+\varepsilon_t=\phi \varepsilon_{t-1}+\sigma \xi_t
+\end{split}
+\end{align}
+
+Where the dependant variable $y_t$ (which can be the price or the natural logarithm of the price) is expressed in terms of a function of a vector of parameters $\Theta$ and explanatory variables $x_t$ and an autoregressive process of order one $\varepsilon_t$. By combining both equations \citep{Lucia2002a}, we obtain:
+
+\begin{align}
+\label{eq:gen2}
+y_t=\phi y_{t-1}+f(\Theta,x_t)-\phi f(\Theta,x_{t-1})+\sigma \xi_t
+\end{align}
+
+The parameters $\Theta$ and $\phi$ of equation \ref{eq:gen2} are estimated simultaneously using a non-linear least squares algorithm as in \citep{Lucia2002a}. The estimation of the reversing speed is then calculated as $\hat{\kappa}=1-\hat{\phi}$ and $\hat{\sigma}$ as the regression standard error. The results of the estimation are reported in Table \ref{tab:est}.
+
+For all four models, the intercept has a positive significant value that can be viewed as a base price for electricity. The parameter associated to the trend is also positive which reflects the growing behaviour noted before. The parameters that model the day category and intra-day dynamics are all significant but on the contrary, some of the parameters regarding the intra-year behaviour, aren't significant (both with dummies and with Fourier series). The estimates of the coefficients $\beta_T$, $\beta_D$ and $\sigma$ are virtually indistinguishable between models 1 and 2, and between models 3 and 4. Although $\phi$ is very similar to 1, the null hypothesis of being equal is rejected, which means $\kappa$ although very small is still significant.
+
+\paragraph{Mean reversion with jumps models}
+Analogously, to estimate the parameters of the models using the discrete data available, we discretized the continuous-time expression of equation \ref{eq:sY} as:
+
+\[Y_t\left\{
+\begin{array}{ll}
+    \phi Y_t+\sigma\xi & \textup{with probability } (1-\lambda) \\
+      \phi Y_t+\sigma\xi+\mu_J+\sigma_J\xi_J & \textup{with probability } \lambda \\
+      0 & \textup{otherwise} \\
+\end{array} 
+\right. \]
+
+Where $\xi$ and $\xi_J$ $\sim N(0,1)$ and $\phi=1-\kappa$. The conditional density function of $Y_t$ given $Y_{t-1}$ follows a Poisson-Gaussian Process that can be approximated \citep{Escribano2011} with a mixture of normal distributions as:
+
+\begin{align}
+\label{eq:like}
+\begin{split}
+f(Y_t\mid Y_{t-1})=\lambda\left ( \frac{1}{\sqrt{2\pi( \sigma^2+\sigma_J^2)}} \exp\left ( \frac{-(Y_t-\alpha-\phi Y_{t-1}-\mu_J)^2}{2(\sigma^2+\sigma_J)} \right )\right )+\\
+(1-\lambda)\left ( \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left ( \frac{-(Y_t-\alpha-\phi Y_{t-1})^2}{2\sigma^2} \right )\right )
+\end{split}
+\end{align}
+
+Knowing this, the models proposed are:
+
+\textit{\textbf{Model 5.} Natural logarithm of price - Mean reversion with jumps, months as dummy variables}.
+
+\begin{align}
+\label{eq:m4}
+\begin{split}
+\ln P_t=f_1(t)+Y_t\\
+\end{split}
+\end{align}
+
+\[Y_t\left\{
+\begin{array}{ll}
+    \phi Y_t+\sigma\xi & \textup{with probability } (1-\lambda) \\
+      \phi Y_t+\sigma\xi+\mu_J+\sigma_J\xi_J & \textup{with probability } \lambda \\
+      0 & \textup{otherwise} \\
+\end{array} 
+\right. \]
+
+
+\textit{\textbf{Model 6.} Natural logarithm of price - Mean reversion with jumps, months as Fourier series}.
+
+\begin{align}
+\label{eq:m4}
+\begin{split}
+\ln P_t=f_2(t)+Y_t\\
+\end{split}
+\end{align}
+
+\[Y_t\left\{
+\begin{array}{ll}
+    \phi Y_t+\sigma\xi & \textup{with probability } (1-\lambda) \\
+      \phi Y_t+\sigma\xi+\mu_J+\sigma_J\xi_J & \textup{with probability } \lambda \\
+      0 & \textup{otherwise} \\
+\end{array} 
+\right. \]
+
+The estimation of parameters in models 5 and 6, was developed in 2 stages. First, an ordinary least squares regression was fitted to obtain the coefficients regarding the deterministic component of each model. Then, the series of $Y_t$ is calculated as the residuals of this regression. As a second stage, the parameters $\Theta=\left \{ \phi,\mu_J,\sigma^2,\sigma_j^2,\lambda\right \}$ can be obtained by the minimizing the minus log likelihood function:
+
+
+\begin{equation}
+\label{eq:FO}
+\min_{\Theta}{-\sum_{t=1}^{T}\ln{f(Y_t\mid Y_{t-1})}} 
+\end{equation}
+$s.t.$
+\begin{equation}
+\label{eq:res}
+\begin{split}
+\phi<1\\
+\sigma^2>0\\
+\sigma^2_J>0\\
+0\leq \lambda \leq 1
+\end{split}
+\end{equation}
+
+The results of the estimation are reported in Table \ref{tab:est}. As with the mean reversion models, most of the parameters estimated with the mean reversion with jumps models (models 5 and 6) are significant. In general, their estimations are similar to models 3 and 4 respectively. The estimates of the coefficients $\beta_T$, $phi$, $\sigma$, $\lambda$, $\mu_j$ and $\sigma_J$ are virtually indistinguishable between models 5 and 6. Although $\phi$ is very similar to 1, the null hypothesis of being equal is rejected, which means $\kappa$ although very small is still significant. $\lambda$ seems to be a little overestimated (17.21\% of jump probability on every observation), this could be due to the coexistence of two high volatility phenomena that are not being modelled independently. For one side, there is the jumps behaviour inherent to electricity price, and for the other side, there exist a low frequency high magnitude component that depends on the presence of El Ni\~no. We think that developing a model separating both sources of jumps, will increase the prediction accuracy.
+ 
+\section{Monte Carlo simulation of future prices}\label{ch:MCSim}
+Regardless of whether the models used prices or natural logarithm of the prices for estimation, the comparison was made with the price series predicted and the validation set of prices. We made 1000 realizations to simulate different price paths for each model. With each stochastic path generated, different error measures were evaluated and then averaged across the paths. That was made for being able to compare the models. Table \ref{tab:comp} shows the different error measures for each of the models proposed.
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{c|cccccc}
+Error Measure & Model 1 & Model 2 & Model 3 & Model 4 & Model 5  & Model 6  \\ \hline
+RMSE          & 181.62  & 182.98  & 173.86  & 178.34  & 506.41   & 498.97   \\
+MAD           & 131.91  & 132.35  & 125.83  & 130.48  & 263.54   & 262.90   \\
+MAPE          & 46.42\% & 46.46\% & 43.31\% & 45.74\% & 113.90\% & 114.39\%
+\end{tabular}
+\caption{Comparison between models}
+\label{tab:comp}
+\end{table}
+
+In general, mean reversion models (models 1 to 4) have a better performance regarding the error measures defined. There is not a significant difference between expressing the intra-year seasonality with dummy variables and with Fourier series for any pair of models. Apparently the log-price mean reverting models (models 3 and 4) have a better overall performance.
+
+\section{Option pricing}\label{ch:OPPric}
+As discussed in section \ref{ch:ElecSys}, the scarcity price is being calculated and fixed. We think this doesn't leave the market to efficiently set price to the derivatives so we wanted to know how the results vary as scarcity price changes. As a sensibility analysis, different scarcity prices were defined from 50 to 500 by a 50 COP step.
+In general, the procedure for pricing a portfolio of American call options was to simulate a new set of 1000 Price paths and for every hour in each series, the positive difference between the spot price and the exercise price ($\max[0,S(\tau)-K]$) was discounted at a constant rate for the valuation of the option. We assumed an annual 10\% rate for this calculation. This corresponds to a discretization of equation \ref{eq:optPrice}. After obtaining a present value for each price path simulated, they we averaged to estimate the option
+premium for a specific scarcity price. Finally the result obtained was divided by the quantity of hours (periods) in the time window to know the mean price of the portfolio (COP/MWh). This method was applied for each scarcity price defined for the sensibility analysis. Additionally, using the real price series and the scarcity prices defined, it was calculated the option premium under the hypothetical condition of having had that exercise price. All this results are consigned in Table \ref{tab:ModComp}.
+
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{c|ccccccc}
+Scarcity Price & \multicolumn{7}{c}{Reliability Charge (COP/kWh)}                   \\
+(COP/kWh)      & Real   & Model 1 & Model 2 & Model 3 & Model 4 & Model 5 & Model 6 \\ \hline
+50             & 94.79 & 10.98   & 10.99   & 11.41   & 11.68   & 26.40   & 26.23   \\
+100            & 56.32  & 6.47    & 6.49    & 6.41    & 6.80    & 23.23   & 22.51   \\
+150            & 34.44  & 3.10    & 3.11    & 3.04    & 3.53    & 19.76   & 19.97   \\
+200            & 23.07  & 1.13    & 1.17    & 1.33    & 1.77    & 17.18   & 17.38   \\
+250            & 17.20  & 0.31    & 0.32    & 0.57    & 0.87    & 15.21   & 15.75   \\
+300            & 13.64   & 0.06    & 0.06    & 0.24    & 0.44    & 14.33   & 14.00   \\
+350            & 10.92   & 0.01    & 0.01    & 0.11    & 0.22    & 12.62   & 12.51   \\
+400            & 8.82   & 0.00    & 0.00    & 0.05    & 0.11    & 11.43   & 11.08   \\
+450            & 7.23   & 0.00    & 0.00    & 0.02    & 0.06    & 10.38   & 10.35   \\
+500            & 5.95   & 0.00    & 0.00    & 0.01    & 0.03    & 9.66    & 9.73   
+\end{tabular}
+\caption{Reliability Charge evaluated for different Scarcity Prices for using the proposed models.}
+\label{tab:ModComp}
+\end{table}
+
+To understand better this results, Figure \ref{fig:CxC} contains the Reliability Charge estimation in COP/MWh for Scarcity Prices between 150 and 500 COP/kWh. The Real curve, corresponds to the average estimation for Reliability Charge, re-sampling the historical data year by year, using a block bootstrap method. For a single year, it can be seen as the money that should have been paid to acquire the option given the performance of the price during that year, to be exerted at a specific Scarcity Price. This curve will serve as benchmark for the models. It is also important to consider that Scarcity Price has been in the 200 to 300 COP/kWh range since its establishment. Behaviour between models 1 to 5 and between models 5 and 6 is practically indistinguishable. Even though models 1 to 4 presented lower magnitudes in every error measure presented in section \ref{ch:MCSim}, they under-perform comparing to Real curve. This could happen due to the high volatility of the prices not being totally captured by a simple mean reverting process. Which means it may exist a fat tails non Gaussian behaviour of the innovations in each period. On the other hand, models 5 and 6 have higher estimations than the mean reverting models. While for low scarcity prices the estimation lies under the real curve, for high scarcity prices 
+it's the other way around. Anyway, for the interest region, the performance of the estimation is very close to the real curve which validates the models. Based on the results obtained it appears to be better to model electricity price with mean reverting jump models for estimating the Reliability Charge.
+
+\begin{figure}[!h] 
+\center
+\includegraphics[scale=0.7]{Figures/CxCComp.eps}
+\caption{Reliability Charge estimation comparison between models.}
+\label{fig:CxC}
+\end{figure}
+
+It may seem counter-intuitive that the models that performed better at the option pricing are those that were outperformed at price forecasting. Even though, due to electricity price having a fat tails behaviour, a solely mean reversion process is not enough for modelling all the dynamics, for it is underestimating the times that the option is being exercised. In the other hand, models 5 and 6, although diverge from the electricity price when the jumps occur, have an option exercise pattern which is more alike to what happens in the real curve.
+
+\section{Concluding Remarks}\label{ch:Conclu}
+This work is an extensive research for the valuation of options of the Colombian electricity market defined under the Reliability charge proposed by CREG in 2006. The models we proposed, based on the existing literature, were successfully applied to the Colombian electricity market. One factor models are implemented for the valuation of power derivatives considering hourly prices of electricity, all of them include a deterministic and a stochastic component. The deterministic component, is associated to climate intra-year season and demand intra-day season. The stochastic component incorporates a mean reverting behaviour and jumps. Using the information available, results regarding the estimations of future electricity prices and option prices were obtained. There is not a significant difference between expressing the intra-year seasonality with dummy variables and with Fourier series for any pair of models. In spite of the results obtained are promising, there exist some inherent difficulties of the Colombian electricity market due to structural changes not included and the presence of the ENSO effect.
+
+\section*{References}
+
+\bibliography{mybibfile2}
+
+\begin{table}[]
+\centering
+\caption{Estimation results for models proposed for electricity prices of the Colombian market}
+\label{tab:est}
+\begin{tabular}{crlrlrlrlrlrl}
+\multicolumn{1}{c|}{Param.}   & \multicolumn{2}{c}{Model 1} & \multicolumn{2}{c}{Model 2} & \multicolumn{2}{c}{Model 3} & \multicolumn{2}{c}{Model 4} & \multicolumn{2}{c}{Model 5} & \multicolumn{2}{c}{Model 6} \\ \hline
+\multicolumn{1}{c|}{$\phi$}      & 0.9591          & ***       & 0.9586          & ***       & 0.9328         & ***        & 0.9468         & ***        & 0.9925         & ***           & 0.9924          & ***          \\
+\multicolumn{1}{c|}{$\beta_0$}   & 111.7757        & ***       & 100.1899        & ***       & 4.3654         & ***        & 4.4079         & ***        & 4.5307         & ***        & 4.4538         & ***       \\
+\multicolumn{1}{c|}{$\beta_T$}   & 2.3453          & ***       & 2.3477          & ***       & 0.0331         & ***        & 0.0265         & ***        & 0.0264         & ***        & 0.0264         & ***       \\
+\multicolumn{1}{c|}{$\beta_D$}   & 1.9437          & ***       & 1.8454          & ***       & 0.0181         & ***        & 0.0174         & ***        & -0.1100        & ***        & -0.0673        & ***       \\
+\multicolumn{1}{c|}{$\gamma_{s1}$} & -13.9397        & ***       & -13.9397        & ***       & -0.1099        & ***        & -0.1099        & ***        & -0.0404        & ***        & -0.1099        & ***       \\
+\multicolumn{1}{c|}{$\gamma_{c1}$} & -4.7253         & ***       & -4.7253         & ***       & -0.0404        & ***        & -0.0404        & ***        & -0.0843        & ***        & -0.0404        & ***       \\
+\multicolumn{1}{c|}{$\gamma_{s2}$} & -10.5466        & ***       & -10.5466        & ***       & -0.0843        & ***        & -0.0843        & ***        & -0.0037        & ***        & -0.0843        & ***       \\
+\multicolumn{1}{c|}{$\gamma_{c2}$} & -0.8852         & ***       & -0.8852         & ***       & -0.0037        & ***        & -0.0037        & ***        & -0.0124        & **         & -0.0037        & **        \\
+\multicolumn{1}{c|}{$\gamma_{s3}$} & -1.3392         & ***       & -1.3392         & ***       & -0.0124        & ***        & -0.0124        & ***        & -0.0402        & ***        & -0.0124         & ***       \\
+\multicolumn{1}{c|}{$\gamma_{c3}$} & -5.5327         & ***       & -5.5327         & ***       & -0.0402        & ***        & -0.0402        & ***        & 0.0220         & ***        & -0.0402         & ***       \\
+\multicolumn{1}{c|}{$\gamma_{s4}$} & 3.1960          & ***       & 3.1960          & ***       & 0.0220         & ***        & 0.0220         & ***        & -0.0137        & ***        & 0.0220         & ***       \\
+\multicolumn{1}{c|}{$\gamma_{c4}$} & -1.8906         & ***       & -1.8906         & ***       & -0.0137        & ***        & -0.0137        & ***        & 0.0181         & ***        & -0.0137        & ***       \\
+\multicolumn{1}{c|}{$\gamma_{s5}$} & 2.4641          & ***       & 2.4641          & ***       & 0.0181         & ***        & 0.0181         & ***        & 0.0062         & ***        & 0.0181         & ***       \\
+\multicolumn{1}{c|}{$\gamma_{c5}$} & 0.9625          & ***       & 0.9625          & ***       & 0.0062         & ***        & 0.0062         & ***        & -0.0052        & ***        & 0.0062         & ***       \\
+\multicolumn{1}{c|}{$\gamma_{s6}$} & -0.7759         & ***       & -0.7759         & ***       & -0.0052        & ***        & -0.0052        & ***        & 0.0127         & ***        & -0.0052        & ***       \\
+\multicolumn{1}{c|}{$\gamma_{c6}$} & 1.9193          & ***       & 1.9193          & ***       & 0.0127         & ***        & 0.0127         & ***        & -0.0161        & ***        & 0.0127         & ***       \\
+\multicolumn{1}{c|}{$\gamma_{s7}$} & -2.1126         & ***       & -2.1126         & ***       & -0.0161        & ***        & -0.0161        & ***        & -0.0050        & ***        & -0.0161        & ***       \\
+\multicolumn{1}{c|}{$\gamma_c7$} & -0.5586         & ***       & -0.5586         & ***       & -0.0050        & ***        & -0.0050        & ***        & 0.0904         & ***        & -0.0050        & ***       \\
+\multicolumn{1}{c|}{$\mu_2$}     & 0.8164          &           &                 &           & 0.0378         &            &                &            & -0.0044        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_3$}     & -9.2962         & **        &                 &           & -0.0414        &            &                &            & -0.0842        &            &                 &           \\
+\multicolumn{1}{c|}{$\mu_4$}     & -15.0182        & ***       &                 &           & -0.0750        & ***        &                &            & -0.2171        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_5$}     & -29.4276        & ***       &                 &           & -0.1997        & ***        &                &            & -0.2864        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_6$}     & -35.6133        & ***       &                 &           & -0.2575        & ***        &                &            & -0.2521        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_7$}     & -32.0898        & ***       &                 &           & -0.2412        & ***        &                &            & -0.1522        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_8$}     & -21.5155        & ***       &                 &           & -0.1448        & ***        &                &            & 0.0289         & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_9$}     & -1.8135         &           &                 &           & 0.0093         &            &                &            & 0.0744         & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_{10}$}    & 2.7564          &           &                 &           & 0.0168         &            &                &            & -0.0617        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_{11}$}    & 2.6582          &           &                 &           & -0.0295        &            &                &            & -0.0445        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\mu_{12}$}    & -0.7164         &           &                 &           & -0.0275        &            &                &            & -0.0676        & ***        &                 &           \\
+\multicolumn{1}{c|}{$\psi_{s1}$}   &                 &           & 11.7378         & ***       &                &            & 0.0611         & ***        &                &            & 0.0606         & ***       \\
+\multicolumn{1}{c|}{$\psi_{c1}$}   &                 &           & -17.8538        & ***       &                &            & -0.1213        & ***        &                &            & -0.1210        & ***       \\
+\multicolumn{1}{c|}{$\psi_{s2}$}   &                 &           & 10.6100         & ***       &                &            & 0.0952         & ***        &                &            & 0.0937         & ***       \\
+\multicolumn{1}{c|}{$\psi_{c2}$}   &                 &           & -6.7336         & ***       &                &            & -0.0437        & ***        &                &            & -0.0437        & ***       \\
+\multicolumn{1}{c|}{$\psi_{s3}$}   &                 &           & -5.8944         & ***       &                &            & -0.0313        & ***        &                &            & -0.0309        & ***       \\
+\multicolumn{1}{c|}{$\psi_{c3}$}   &                 &           & -3.3288         & *         &                &            & -0.0227        & **         &                &            & -0.0216        & ***       \\
+\multicolumn{1}{c|}{$\psi_{s4}$}   &                 &           & -1.3429         &           &                &            & -0.0044        &            &                &            & -0.0052        & ***       \\
+\multicolumn{1}{c|}{$\psi_{c4}$}   &                 &           & 3.2613          & *         &                &            & 0.0148         &            &                &            & 0.0153         & ***       \\
+\multicolumn{1}{c|}{$\psi_{s5}$}   &                 &           & -1.6155         &           &                &            & -0.0020        &            &                &            & -0.0006        &           \\
+\multicolumn{1}{c|}{$\psi_{c5}$}   &                 &           & 5.5780          & ***       &                &            & 0.0281         & ***        &                &            & 0.0266         & ***       \\
+\multicolumn{1}{c|}{$\kappa$}    & 0.0409          &           & 0.0414          &           & 0.0672         &            & 0.0532         &            & 0.0075         &            & 0.0076          &           \\
+\multicolumn{1}{c|}{$\sigma$}    & 20.8571         & ***          & 20.8530         & ***          & 0.1448         & ***           & 0.1447         & ***           & 0.0447        & ***           & 0.0447         & ***           \\
+\multicolumn{1}{c|}{$\lambda$}   &                 &           &                 &           &                &            &                &            & 0.1721         & ***           & 0.1716          & ***          \\
+\multicolumn{1}{c|}{$\mu_J$}     &                 &           &                 &           &                &            &                &            & -0.0013        & ***           & -0.0015         & ***          \\
+\multicolumn{1}{c|}{$\sigma_J$}  &                 &           &                 &           &                &            &                &            & 0.3366         & ***           & 0.3369          & ***          \\
+                                 &                 &           &                 &           &                &            &                &            &                &            &                 &           \\
+\multicolumn{13}{l}{Significance codes: 1\%‘***’5\%‘**’10\%‘*’}                                                                                                                                                     
+\end{tabular}
+\end{table}
+
+\end{document}
