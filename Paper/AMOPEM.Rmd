@@ -1,0 +1,87 @@
+---
+title: "A Methodology for Option Pricing in Electricity Markets. Case study: Colombia"
+author: 
+  - Pablo Andrés Uriza Antorveza
+  - Sergio Cabrales
+date: "`r Sys.Date()`"
+output:
+  bookdown::word_document2: default
+  bookdown::gitbook:
+    config:
+      toc:
+        collapse: section
+    self.contained: yes
+    split_by: none
+  bookdown::epub_book: default
+  bookdown::pdf_document2:
+    dev: tikz
+    keep_tex: yes
+    number_sections: yes
+    toc: no
+  bookdown::html_document2: default
+bibliography: [my_first.bib]
+abstract: This document...
+---
+
+```{r setup, include=FALSE}
+## Some global options that are fed to the knitr enging
+knitr::opts_chunk$set(echo = FALSE,
+                      out.width="90%",
+                      cache=TRUE,
+                      autodep=TRUE,
+                      collapse=TRUE,
+                      message=FALSE,
+                      warning=FALSE,
+                      fig.pos="!ht",
+                      fig.align='center')
+```
+
+# Pre
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+# Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+The mean temperature is `r pander::pander(mean(pressure$temperature))` and the mean pressure is `r pander::pander(mean(pressure$pressure))`.
+
+# Mathematics
+
+We use standard LaTeX for equations, for instance the OLS estimator of $\beta$ in the classical linear model is given by
+\begin{align*}
+\hat\beta&=(X'X)^{-1}X'Y\\
+\hat Y&=X'\hat\beta\\
+&=X(X'X)^{-1}X'Y
+\end{align*}
+
+# The pander package
+
+`pander` tries to make a guess about how to best typeset some `R` routine.
+
+```{r}
+x <- rnorm(100)
+y <- rchisq(100,df=3)
+pander::pander(t.test(x,y))
+p <- 0.1
+```
+
+The five number summary for $X$ is `r pander::pander(fivenum(x))`.
+
+`r ifelse(p < 0.05, "Reject the null at the 5% level", "Fail to reject the nmull at the 5% level")`
+
+# References
+
+We can use a BibTeX database for references, e.g., @bookdown.
+
+# References {-}
